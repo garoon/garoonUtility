@@ -29,5 +29,5 @@ SOAP APIのリクエストやレスポンスをjson形式で取り扱うこと�
 ##License
 MIT License
 
-##Copyriht
+##Copyright
 Copyright(c) Cybozu, Inc.
