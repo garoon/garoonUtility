@@ -8,6 +8,7 @@
 var $ = require("jquery");
 window.GSC = window.GSC || {};
 var appFunction = function (url, username, password) {
+//var appFunction = function (url) {
   /// <summary>ガルーン 連携 API を実行するためのクラス</summary>
   /// <param name="url" type="String">アクセス先のURL。URlは ag.exe(cgi) または grn.exe(cgi) で終わる必要がある。</param>
   /// <param name="username" type="String">省略可。username と password を指定した場合、クラス生成時に auth を実行する。</param>
@@ -25,17 +26,17 @@ var appFunction = function (url, username, password) {
   var requestToken;
 
   // public variables
-
-  this.error;
+  this.error = "";
   /// <value type="Object">直前のエラー情報</value>
 
-  this.user;
+  this.user = "";
   /// <value type="Object">認証を行ったユーザー情報</value>
 
-  this.userId;
+  this.userId = "";
   /// <value type="String">認証を行ったユーザーのID</value>
 
   this.debug = false;
+  
   /// <value type="Boolean">デバッグモードか否か</value>
 
   // initialize service URL
@@ -55,115 +56,6 @@ var appFunction = function (url, username, password) {
   this.cybozuURL = function () { return _cybozuURL; };
   this.cybozuType = function () { return _cybozuType; };
   this.isCloud = function () { return _isCloud; };
-  this.auth = function (username, password) {
-    /// <summary> APIに対して認証を行う。auth 実行後、query, exec を呼び出すことができる。</summary>
-    /// <param name="username" type="String">ログイン名</param>
-    /// <param name="password" type="String">パスワード</param>
-    /// <returns type="Boolean">true: 成功、false: 失敗</returns>
-    cybozuUsername = username;
-    cybozuPassword = password;
-    var res = this.query("Base", "BaseGetUsersByLoginName", { login_name: { innerValue: cybozuUsername} });
-    if (res.error) {
-      cybozuUsername = cybozuPassword = null;
-    } else {
-      var user = $(res.response).find("user");
-      if (user.length) {
-        this.user = {
-          id: user.attr("key"),
-          key: user.attr("key"),
-          login_name: user.attr("login_name"),
-          name: user.attr("name"),
-          status: user.attr("status"),
-          email: user.attr("email"),
-          primary_organization_id: user.attr("primary_organization")
-        };
-        this.userId = this.user.id;
-        return true;
-      } else {
-        cybozuUsername = cybozuPassword = null;
-      }
-    }
-    return false;
-  };
-
-  this.clearAuth = function () {
-    /// <summary>認証をクリアする。再度 auth を実行しない限り、query, exec を呼び出すことはできなくなる。</summary>
-    cybozuUsername = cybozuPassword = null;
-    this.user = this.userId = null;
-  };
-
-  // authentication
-  if (username && password) {
-    this.auth(username, password);
-  }
-
-  this.sso = function () {
-    /// <summary>Cookie認証を有効にする。</summary>
-    var res = this.query("Util", "UtilGetLoginUserId", null);
-    if (res.error) return false;
-    var user_id = $(res.response).find("user_id");
-    if (user_id.length == 0) return false;
-    var userId = user_id.text();
-
-    res = this.query("Base", "BaseGetUsersById", { user_id: { innerValue: userId} });
-    if (res.error) return false;
-    var user = $(res.response).find("user");
-    if (user.length == 0) return false;
-    this.user = {
-      id: user.attr("key"),
-      key: user.attr("key"),
-      login_name: user.attr("login_name"),
-      name: user.attr("name"),
-      status: user.attr("status"),
-      email: user.attr("email"),
-      primary_organization_id: user.attr("primary_organization")
-    };
-    this.userId = this.user.id;
-
-    requestToken = this.getRequestToken();
-    if (!requestToken) {
-      this.user = null;
-      this.userId = null;
-      return false;
-    }
-    return true;
-  };
-
-  this.isSSO = function () {
-    /// <summary>Cookie認証が有効化どうかを返す。</summary>
-    return requestToken ? true : false;
-  };
-
-  this.getRequestToken = function () {
-    /// <summary>リクエストトークンを返す。</summary>
-    var res = this.query("Util", "UtilGetRequestToken", null);
-    if (res.error) return null;
-    var token = $(res.response).find("request_token");
-    if (token.length == 0) return null;
-    return token.text();
-  };
-  this.query = function (service, method, params, alertIfError, debug) {
-    /// <summary>APIのうち、データ取得系についてのみ実行する。誤ってデータを更新することを防ぐことができる。引数と戻り値は exec と同様。</summary>
-    if (method.indexOf(service + "Get") != 0 && method.indexOf(service + "Search") != 0) {
-      this.error = { message: "query() メソッドで更新系APIを実行することはできません。" };
-      if (alertIfError) {
-        alert(this.error.message);
-      }
-      return { error: this.error };
-    }
-    return this.exec(service, method, params, alertIfError, debug);
-  };
-  this.update = function (service, method, params, alertIfError, debug) {
-    /// <summary>APIのうち、データ更新系についてのみ実行する。Cookie認証が有効のときデータ更新系ではリクエストトークンが必要となるが、このAPIではリクエストトークンのセットを代行する。</summary>
-    if (this.isSSO()) {
-        var newParams = { request_token: { innerValue: requestToken} };
-        for (var key in params) {
-            newParams[key] = params[key];
-        }
-        params = newParams;
-    }
-    return this.exec(service, method, params, alertIfError, debug);
-  };
   this.exec = function (service, method, params, alertIfError, debug) {
     /// <summary>APIを実行する。</summary>
     /// <param name="service" type="String">アプリケーション識別子 (Base/Schedule/...)</param>
@@ -172,7 +64,6 @@ var appFunction = function (url, username, password) {
     /// <param name="alertIfError" type="Boolean">true のとき、API実行時にエラーが出た場合、アラートボックスを表示する。</param>
     /// <param name="debug" type="Boolean">true のとき、デバッグモードになり、APIへのリクエストおよびレスポンスのXMLの内容が、アラートボックスに表示される。</param>
     /// <returns type="Object">(obj).response にAPIからの戻り値のXMLが入る。エラーの場合 (obj).error.code にエラーコード、(obj).error.message にエラーメッセージが入る。</returns>
-
     // timestamp
     var time = (new Date()).getTime();
     var created = GSC.CybozuConnect.myUtility.formatISO8601(time, false);
@@ -202,11 +93,14 @@ var appFunction = function (url, username, password) {
 <' + method + ' xmlns="http://wsdl.cybozu.co.jp/base/2008">';
     requestXml += _makeParametersXml("parameters", params);
     requestXml += '</' + method + '></soap:Body></soap:Envelope>';
-
+    /*
     if (debug || this.debug) {
       alert(requestXml);
     }
-
+    */
+    if(debug){
+      console.log(requestXml);
+    }
     // call API
     var req = new XMLHttpRequest;
     var url = _cybozuURL;
@@ -274,7 +168,118 @@ var appFunction = function (url, username, password) {
     }
     return res;
   };
+  this.query = function (service, method, params, alertIfError, debug) {
+    /// <summary>APIのうち、データ取得系についてのみ実行する。誤ってデータを更新することを防ぐことができる。引数と戻り値は exec と同様。</summary>
+    if (method.indexOf("Get") == -1 && method.indexOf("Search") == -1) {
+      this.error = { message: "query() メソッドで更新系APIを実行することはできません。" };
+      if (alertIfError) {
+        alert(this.error.message);
+      }
+      return { error: this.error };
+    }
+    return this.exec(service, method, params, alertIfError, debug);
+  };
+  
+  
+  this.auth = function (username, password) {
+    /// <summary> APIに対して認証を行う。auth 実行後、query, exec を呼び出すことができる。</summary>
+    /// <param name="username" type="String">ログイン名</param>
+    /// <param name="password" type="String">パスワード</param>
+    /// <returns type="Boolean">true: 成功、false: 失敗</returns>
+    cybozuUsername = username;
+    cybozuPassword = password;
+    var res = this.query("Base", "BaseGetUsersByLoginName", { login_name: { innerValue: cybozuUsername} });
+    if (res.error) {
+      cybozuUsername = cybozuPassword = null;
+    } else {
+      var user = $(res.response).find("user");
+      if (user.length) {
+        this.user = {
+          id: user.attr("key"),
+          key: user.attr("key"),
+          login_name: user.attr("login_name"),
+          name: user.attr("name"),
+          status: user.attr("status"),
+          email: user.attr("email"),
+          primary_organization_id: user.attr("primary_organization")
+        };
+        this.userId = this.user.id;
+        return true;
+      } else {
+        cybozuUsername = cybozuPassword = null;
+      }
+    }
+    return false;
+  };
+    
+  this.clearAuth = function () {
+    /// <summary>認証をクリアする。再度 auth を実行しない限り、query, exec を呼び出すことはできなくなる。</summary>
+    cybozuUsername = cybozuPassword = null;
+    this.user = this.userId = null;
+  };
+  
+  // authentication
+  
+  if (username && password) {
+    this.auth(username, password);
+  }
+  
+    this.sso = function () {
+    /// <summary>Cookie認証を有効にする。</summary>
+    var res = this.query("Util", "UtilGetLoginUserId", null);
+    if (res.error) return false;
+    var user_id = $(res.response).find("user_id");
+    if (user_id.length == 0) return false;
+    var userId = user_id.text();
 
+    res = this.query("Base", "BaseGetUsersById", { user_id: { innerValue: userId} });
+    if (res.error) return false;
+    var user = $(res.response).find("user");
+    if (user.length == 0) return false;
+    this.user = {
+      id: user.attr("key"),
+      key: user.attr("key"),
+      login_name: user.attr("login_name"),
+      name: user.attr("name"),
+      status: user.attr("status"),
+      email: user.attr("email"),
+      primary_organization_id: user.attr("primary_organization")
+    };
+    this.userId = this.user.id;
+
+    requestToken = this.getRequestToken();
+    if (!requestToken) {
+      this.user = null;
+      this.userId = null;
+      return false;
+    }
+    return true;
+  };
+
+  this.isSSO = function () {
+    /// <summary>Cookie認証が有効化どうかを返す。</summary>
+    return requestToken ? true : false;
+  };
+
+  this.getRequestToken = function () {
+    /// <summary>リクエストトークンを返す。</summary>
+    var res = this.query("Util", "UtilGetRequestToken", null);
+    if (res.error) return null;
+    var token = $(res.response).find("request_token");
+    if (token.length == 0) return null;
+    return token.text();
+  };
+  this.update = function (service, method, params, alertIfError, debug) {
+    /// <summary>APIのうち、データ更新系についてのみ実行する。Cookie認証が有効のときデータ更新系ではリクエストトークンが必要となるが、このAPIではリクエストトークンのセットを代行する。</summary>
+    if (this.isSSO()) {
+        var newParams = { request_token: { innerValue: requestToken} };
+        for (var key in params) {
+            newParams[key] = params[key];
+        }
+        params = newParams;
+    }
+    return this.exec(service, method, params, alertIfError, debug);
+  };
   this.queryItems = function (service, methodOfGetVersions, methodOfGetById, idName, itemName) {
     var params = {};
     params[idName] = new Array();

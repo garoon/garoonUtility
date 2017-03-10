@@ -9,7 +9,6 @@ var myUtility  = {
     /// <summary>XMLからDOMを構築する。</summary>
     /// <param name="text" type="String">XML</param>
     /// <returns type="Object">DOM。構築できなかった場合 null を返す。</returns>
-
     if (window.ActiveXObject) {
       var dom = new ActiveXObject("Microsoft.XMLDOM");
       dom.loadXML(text);

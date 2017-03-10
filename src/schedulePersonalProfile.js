@@ -5,6 +5,7 @@
 *
 * Copyright (C) 2017 Cybozu, Inc.
 */
+var $ = require("jquery");
 var schedulePersonalProfile = function (res) {
     /// <summary>スケジュールの個人設定を表すクラス</summary>
     /// <param name="res" type="Object">APIからのレスポンス</param>
