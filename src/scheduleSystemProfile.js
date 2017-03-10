@@ -5,6 +5,7 @@
 *
 * Copyright (C) 2017 Cybozu, Inc.
 */
+var $ = require("jquery");
 var scheduleSystemProfile = function (res) {
     /// <summary>スケジュールのシステム設定を表すクラス</summary>
     /// <param name="res" type="Object">APIからのレスポンス</param>

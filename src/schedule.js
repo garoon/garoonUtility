@@ -249,7 +249,6 @@
       // when
       params.schedule_event.when = createWhen(event);
     }
-
     var res = app.update("Schedule", "ScheduleAddEvents", params, true);
     if (res.error) return null;
 
@@ -529,9 +528,11 @@
     /// <returns type="Array">フォローが追加された予定の配列</returns>
 
     var params = {};
+    /*
     if (!$.isPlainObject(follows) && $.isArray(follows)) {
       throw "'follows' must be a plain object or a array.";
     }
+    */
     params.follow = follows;
     var res = app.update("Schedule", "ScheduleAddFollows", params, true);
     if (res.error) return null;
@@ -571,9 +572,11 @@
     /// <return type="Boolean" />true: 成功、false: 失敗</returns>
 
     var params = {};
+    /*
     if (!$.isPlainObject(follows) && $.isArray(follows)) {
       throw "'follows' must be a plain object or a array.";
     }
+    */
     params.follow = follows;
     var res = app.update("Schedule", "ScheduleAddFollowsToRepeatEvent", params, true);
     if (res.error) return false;
@@ -793,7 +796,6 @@
         date.end = date.start;
       }
       return { date: date };
-
     } else {
       var datetime = { start: GSC.CybozuConnect.myUtility.formatISO8601(event.start, true) }; // not xsd:datetime
       if (event.end) {
