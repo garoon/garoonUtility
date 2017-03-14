@@ -1,7 +1,7 @@
 const webpack = require('webpack');
 module.exports = {
   entry: {
-    js:"./src/main.js"
+    js:"./src/soap/main.js"
   },
   output:{
     path:"./dist",
