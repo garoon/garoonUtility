@@ -1,7 +1,7 @@
-garoon-soap-connector
+garoon Utility for JavaScript
 ==============
 # Overview
-garoon-soap-connectorはサイボウズ ガルーンのSOAP APIにアクセスするJavaScript ライブラリです。  
+garoon Utility for JavaScriptはサイボウズ ガルーンのSOAP APIにアクセスするJavaScript ライブラリです。  
 SOAP APIのリクエストやレスポンスをjson形式で取り扱うことができます。
 
 ## Desctiption
