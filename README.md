@@ -19,7 +19,8 @@ SOAP APIのリクエストやレスポンスをjson形式で取り扱うこと�
   * [jQuery](http://jquery.com/) v3.1.1
 
 ## Usage
-* [リファレンス](https://github.com/north-river/garoon-soap-connector/wiki)
+* 各クラスの参照は [リファレンス](https://github.com/north-river/garoonUtlity/wiki)を参考にしてください。
+* [Tips](https://cybozudev.zendesk.com/hc/ja/articles/115001805783)
 
 ## VS.
 [cybozu-connect](https://github.com/hatashinya/cybozu-connect)との相違点は以下です。
