@@ -5,7 +5,7 @@ module.exports = {
   },
   output:{
     path:"./dist",
-    filename:"garoonSoapConnector.min.js"
+    filename:"garoonUtility.min.js"
   },
   plugins :[
     new webpack.optimize.UglifyJsPlugin()
