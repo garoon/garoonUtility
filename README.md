@@ -13,6 +13,8 @@ SOAP APIのリクエストやレスポンスをjson形式で取り扱うこと�
 * SOAP APIリファレンス
   * [Garoon(ガルーン) API](https://cybozudev.zendesk.com/hc/ja/articles/202228424) 
 * APIアクセスの度に、ログイン名およびパスワードをプレーンテキストでサーバーに送信しています。セキュリティを確保するためには、SSLをご利用ください。
+* 本ライブラリはサポートの対象外です。
+* 質問がある場合はcybozu developer networkの[コミュニティ](https://cybozudev.zendesk.com/hc/ja/community/topics/200674863-Garoon-API-%E3%83%95%E3%82%A9%E3%83%BC%E3%83%A9%E3%83%A0)をご活用ください。
 
 ## Requirement
 * 以下の JavaScript ライブラリに依存しています。
